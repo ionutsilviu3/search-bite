@@ -1,54 +1,55 @@
 import { useState, useEffect } from "react";
-import React from "react";
-import MovieCard from "./MovieCard"
+import IngredientCard from "./IngredientCard";
 import './App.css';
 import SearchIcon from './searchIcon.svg';
 
-const API_URL = 'http://www.omdbapi.com/?i=tt3896198&apikey=293bb193'
+const API_URL = '/';
 
 const App = () => {
+    const [ingredients, setIngredients] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
-    const [movies, setMovies] = useState([]);
-
-    const[searchTerm, setSearchTerm] = useState('');
-
-    const searchMovies = async (title) => {
-        const response = await fetch(`${API_URL}&s=${title}`);
-        const data = await response.json();
-        setMovies(data.Search);
+    const searchIngredients = async () => {
+        try {
+            const response = await fetch(`${API_URL}ingredients`);
+            const data = await response.json();
+            setIngredients(data);
+        } catch (error) {
+            console.error('Error fetching ingredients:', error.message);
+        }
     }
 
     useEffect(() => {
-        searchMovies(searchTerm);
-    }, [])
+        searchIngredients();
+    }, []);
+
     return (
         <div className="app">
-            <h1>MovieLand</h1>
-
+            <h1>SearchBite</h1>
             <div className="search">
-                <input placeholder="Search for movies"
-                    value = {searchTerm}
+                <input
+                    placeholder="What ingredients do you have in your fridge?"
+                    value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <img
                     src={SearchIcon}
                     alt="search"
-                    onClick={() => searchMovies(searchTerm)}
+                    onClick={() => searchIngredients(searchTerm)}
                 />
             </div>
             {
-                movies?.length > 0
+                ingredients?.length > 0
                     ? (
                         <div className="container">
-                            {movies.map((movie) => (
-                                <MovieCard movie={movie} />
+                            {ingredients.map((ingredient) => (
+                                <IngredientCard key={ingredient.id} ingredient={ingredient} />
                             ))}
-
                         </div>
                     ) :
                     (
                         <div className="empty">
-                            <h2>No movies found</h2>
+                            <h2>No ingredients found</h2>
                         </div>
                     )
             }
